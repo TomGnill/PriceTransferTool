@@ -34,13 +34,14 @@ namespace PriceTool
 
             for (int row = _priceStartRow; row < MainSheet.RowCount(); row++)
             {
+                double price;
                 if (!string
                     .IsNullOrEmpty(MainSheet.Cell(row, _priceColumnNubmer)
-                        .Value.ToString()))
+                        .Value.ToString()) && double.TryParse(MainSheet.Cell(row, _priceColumnNubmer)
+                    .Value.ToString(), out price))
                 {
                     string vendorCode = MainSheet.Cell(row, _vendorCodeColumnNubmer).Value.ToString();
                     string name = MainSheet.Cell(row, _nameColumnNubmer).Value.ToString();
-                    double price = double.Parse(MainSheet.Cell(row, _priceColumnNubmer).Value.ToString());
                     newPrices.Add(new Product(vendorCode, name, price));
                 }
             }

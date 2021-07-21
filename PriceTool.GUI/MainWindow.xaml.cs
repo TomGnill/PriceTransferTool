@@ -1,4 +1,6 @@
 ﻿
+using System.Globalization;
+using System.Threading;
 using System.Windows;
 using Microsoft.Win32;
 using FileDialog = System.Windows.Forms.FileDialog;
@@ -14,6 +16,7 @@ namespace PriceTool.GUI
     {
         public MainWindow()
         {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
             InitializeComponent();
         }
 
@@ -23,7 +26,8 @@ namespace PriceTool.GUI
             {
                 ExcelParser firstExcel = new ExcelParser(pathToNewPrices.Text);
                 ExcelParser secondExcel = new ExcelParser(pathToPriceList.Text);
-                secondExcel.TransferPrices(firstExcel.ParsePriceList());
+                secondExcel.TransferPrices(firstExcel.ParsePriceList()).SaveExcel(pathToPriceList.Text);
+                MessageBox.Show("Готово");
             }
             else
             {
