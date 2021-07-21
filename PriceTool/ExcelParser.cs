@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using ClosedXML.Excel;
 using System.Linq;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace PriceTool
 {
@@ -12,6 +13,7 @@ namespace PriceTool
         public IXLWorkbook Workbook { get; set; }
         private IXLWorksheet MainSheet { get; set; }
         public List<Product> NotFoundProducts;
+        public bool IsChanged = false;
         private int _vendorCodeColumnNumber;
         private int _nameColumnNumber;
         private int _priceColumnNumber;
@@ -70,17 +72,21 @@ namespace PriceTool
                     string vendorCode = ExtensionMethods.ParseVendorCode(MainSheet.Cell(row, _nameColumnNumber).Value.ToString());
                     if (ExtensionMethods.CheckVendorCode(vendorCode, newPrices))
                     {
+                        IsChanged = true;
                         Product product = newPrices.Find(prod => prod.VendorCode == vendorCode);
                         MainSheet.Cell(row, _newPricesColumn).Value = product.Price;
                         newPrices.Remove(product);
                     }
                 }
             }
+
+            NotFoundProducts = newPrices;
             return this;
         }
 
         public IXLWorkbook SaveNotFoundProducts(List<Product> notFoundProducts, string path)
         {
+            File.Delete(path);
             IXLWorkbook newWorkbook = new XLWorkbook(path); 
             newWorkbook.AddWorksheet();
             IXLWorksheet newWorksheet = newWorkbook.Worksheet(1);
@@ -96,6 +102,7 @@ namespace PriceTool
                 newWorksheet.Cell(row, 3).Value = product.Price;
                 row++;
             }
+            Workbook.Save();
             return newWorkbook;
         }
 
