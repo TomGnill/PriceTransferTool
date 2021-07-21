@@ -11,10 +11,12 @@ namespace PriceTool
     {
         public IXLWorkbook Workbook { get; set; }
         private IXLWorksheet MainSheet { get; set; }
-        private int _vendorCodeColumnNubmer;
-        private int _nameColumnNubmer;
-        private int _priceColumnNubmer;
+        public List<Product> NotFoundProducts;
+        private int _vendorCodeColumnNumber;
+        private int _nameColumnNumber;
+        private int _priceColumnNumber;
         private int _priceStartRow;
+        private int _newPricesColumn;
 
         public ExcelParser(string path)
         {
@@ -22,58 +24,82 @@ namespace PriceTool
             MainSheet = Workbook.Worksheets.Worksheet(1);
         }
 
-        public void SaveExcel(string path)
-        {
-            Workbook.SaveAs(path);
-        }
+        public ExcelParser() { }
 
         public List<Product> ParsePriceList()
         {
-            ParseColumns();
+            ParseColumnsNewPriceList();
             List<Product> newPrices = new List<Product>();
 
             for (int row = _priceStartRow; row < MainSheet.RowCount(); row++)
             {
-                double price;
                 if (!string
-                    .IsNullOrEmpty(MainSheet.Cell(row, _priceColumnNubmer)
-                        .Value.ToString()) && double.TryParse(MainSheet.Cell(row, _priceColumnNubmer)
-                    .Value.ToString(), out price))
+                    .IsNullOrEmpty(MainSheet.Cell(row, _priceColumnNumber)
+                        .Value.ToString()) && double.TryParse(MainSheet.Cell(row, _priceColumnNumber)
+                    .Value.ToString(), out var price))
                 {
-                    string vendorCode = MainSheet.Cell(row, _vendorCodeColumnNubmer).Value.ToString();
-                    string name = MainSheet.Cell(row, _nameColumnNubmer).Value.ToString();
+                    string vendorCode = MainSheet.Cell(row, _vendorCodeColumnNumber).Value.ToString();
+                    string name = MainSheet.Cell(row, _nameColumnNumber).Value.ToString();
                     newPrices.Add(new Product(vendorCode, name, price));
                 }
             }
-
             return newPrices;
+        }
+
+        public List<Product> MultiParseList(string path)
+        {
+            var files = Directory.GetFiles(path);
+            List<string> xlsxs = files.Where(a => a.EndsWith(".xlsx")).ToList();
+            List<Product> allNewPrices = new List<Product>();
+            foreach (var strings in xlsxs)
+            {
+                allNewPrices.AddRange(new ExcelParser(strings).ParsePriceList());
+            }
+            return allNewPrices;
         }
 
         public ExcelParser TransferPrices(List<Product> newPrices)
         {
-            ParseColumns();
+            ParseColumnPriceList();
             for (int row = _priceStartRow; row < MainSheet.RowCount(); row++)
             {
                 if (!string
-                    .IsNullOrEmpty(MainSheet.Cell(row, _priceColumnNubmer)
+                    .IsNullOrEmpty(MainSheet.Cell(row, _priceColumnNumber)
                         .Value.ToString()))
                 {
-                    string vendorCode = MainSheet.Cell(row, _vendorCodeColumnNubmer).Value.ToString();
+                    string vendorCode = ExtensionMethods.ParseVendorCode(MainSheet.Cell(row, _nameColumnNumber).Value.ToString());
                     if (ExtensionMethods.CheckVendorCode(vendorCode, newPrices))
                     {
                         Product product = newPrices.Find(prod => prod.VendorCode == vendorCode);
-                        MainSheet.Cell(row, _nameColumnNubmer).Value = product.Name;
-                        MainSheet.Cell(row, _priceColumnNubmer).Value = product.Price;
+                        MainSheet.Cell(row, _newPricesColumn).Value = product.Price;
+                        newPrices.Remove(product);
                     }
                 }
             }
-
             return this;
         }
 
+        public IXLWorkbook SaveNotFoundProducts(List<Product> notFoundProducts, string path)
+        {
+            IXLWorkbook newWorkbook = new XLWorkbook(path); 
+            newWorkbook.AddWorksheet();
+            IXLWorksheet newWorksheet = newWorkbook.Worksheet(1);
+            int row = 2;
 
+            newWorksheet.Cell(1, 1).Value = "Артикул";
+            newWorksheet.Cell(1, 2).Value = "Наименование";
+            newWorksheet.Cell(1, 3).Value = "Цена";
+            foreach (var product in notFoundProducts)
+            {
+                newWorksheet.Cell(row, 1).Value = product.VendorCode;
+                newWorksheet.Cell(row, 2).Value = product.Name;
+                newWorksheet.Cell(row, 3).Value = product.Price;
+                row++;
+            }
+            return newWorkbook;
+        }
 
-        public void ParseColumns()
+        public void ParseColumnsNewPriceList()
         {
             int column = 1;
             for (int row = 1; row < MainSheet.RowCount(); row++)
@@ -86,28 +112,63 @@ namespace PriceTool
                         if (MainSheet.Cell(row, column).Value.ToString()
                             == "Артикул")
                         {
-                            _vendorCodeColumnNubmer = column;
+                            _vendorCodeColumnNumber = column;
                         }
                         if (MainSheet.Cell(row, column).Value.ToString()
                             == "Наименование")
                         {
-                            _nameColumnNubmer = column;
+                            _nameColumnNumber = column;
                         }
                         if (MainSheet.Cell(row, column).Value.ToString()
                             == "РРЦ, руб. с НДС" || MainSheet.Cell(row, column).Value.ToString().ToLower()
                             == "Цена".ToLower())
                         {
-                            _priceColumnNubmer = column;
+                            _priceColumnNumber = column;
                         }
 
-                        if (_priceColumnNubmer != 0
-                            && _nameColumnNubmer != 0
-                            && _vendorCodeColumnNubmer != 0)
+                        if (_priceColumnNumber != 0
+                            && _nameColumnNumber != 0
+                            && _vendorCodeColumnNumber != 0)
                         {
                             break;
                         }
                     }
 
+                    _priceStartRow = row + 1;
+                    break;
+                }
+            }
+        }
+
+        public void ParseColumnPriceList()
+        {
+            int column = 1;
+            for (int row = 1; row < MainSheet.RowCount(); row++)
+            {
+                if ((MainSheet.Cell(row, column).Value.ToString() == "Наименование товара") ||
+                    (MainSheet.Cell(row, column).Value.ToString() == "Код"))
+                {
+                    for (column = 1; column < MainSheet.ColumnCount(); column++)
+                    {
+                        if (MainSheet.Cell(row, column).Value.ToString()
+                            == "Наименование товара")
+                        {
+                            _nameColumnNumber = column;
+                        }
+                        if (MainSheet.Cell(row, column).Value.ToString()
+                            == "Цена Розница, руб." || MainSheet.Cell(row, column).Value.ToString().ToLower()
+                            == "Цена".ToLower())
+                        {
+                            _priceColumnNumber = column;
+                            _newPricesColumn = _priceColumnNumber + 1;
+                            MainSheet.Cell(row, _newPricesColumn).Value = "Цена источник";
+                        }
+                        if (_priceColumnNumber != 0
+                            && _nameColumnNumber != 0)
+                        {
+                            break;
+                        }
+                    }
                     _priceStartRow = row + 1;
                     break;
                 }
