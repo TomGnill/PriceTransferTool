@@ -14,15 +14,20 @@ namespace PriceTool.GUI
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
+
         public MainWindow()
         {
             Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
             InitializeComponent();
+            pathToNewPrices.Text = @"C:\example.xlsx";
+            pathToPriceList.Text = @"C:\example.xlsx";
         }
 
         private void Transfer_Button_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(pathToNewPrices.Text) && !string.IsNullOrEmpty(pathToPriceList.Text))
+            if (!string.IsNullOrEmpty(pathToNewPrices.Text) && !string.IsNullOrEmpty(pathToPriceList.Text)
+            && pathToNewPrices.Text.EndsWith(".xlsx") && pathToPriceList.Text.EndsWith(".xlsx")
+            && pathToNewPrices.Text != @"C:\example.xlsx")
             {
                 ExcelParser firstExcel = new ExcelParser(pathToNewPrices.Text);
                 ExcelParser secondExcel = new ExcelParser(pathToPriceList.Text);

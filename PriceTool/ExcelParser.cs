@@ -94,7 +94,8 @@ namespace PriceTool
                             _nameColumnNubmer = column;
                         }
                         if (MainSheet.Cell(row, column).Value.ToString()
-                            == "РРЦ, руб. с НДС")
+                            == "РРЦ, руб. с НДС" || MainSheet.Cell(row, column).Value.ToString().ToLower()
+                            == "Цена".ToLower())
                         {
                             _priceColumnNubmer = column;
                         }
