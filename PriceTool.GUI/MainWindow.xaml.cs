@@ -28,6 +28,7 @@ namespace PriceTool.GUI
 
         private void Transfer_Button_Click(object sender, RoutedEventArgs e)
         {
+            
             if (string.IsNullOrEmpty(pathToNewPrices.Text) && !string.IsNullOrEmpty(pathToNewPriceList.Text))
             {
                 if (!string.IsNullOrEmpty(pathToNewPriceList.Text) && Directory.GetFiles(pathToNewPriceList.Text).Where(a => a.EndsWith(".xlsx"))
@@ -47,12 +48,18 @@ namespace PriceTool.GUI
                         if (secondExcel.IsChanged)
                         {
                             secondExcel.Workbook.Save();
+                            CreateNotFoundProducts(PathToNotFoundProducts(), secondExcel);
                         }
                         else
                         {
                             MessageBox.Show("Без изменений");
                         }
                         MessageBox.Show("Готово");
+                        if (secondExcel.NotFoundProducts.Count > 0)
+                        {
+                            MessageBox.Show(NotFoundProductsMessageBuilder(PathToNotFoundProducts(),
+                                secondExcel.NotFoundProducts.Count));
+                        }
                     }
                     else
                     {
@@ -74,12 +81,18 @@ namespace PriceTool.GUI
                     if (secondExcel.IsChanged)
                     {
                         secondExcel.Workbook.Save();
+                        CreateNotFoundProducts(PathToNotFoundProducts(), secondExcel);
                     }
                     else
                     {
                         MessageBox.Show("Без изменений");
                     }
                     MessageBox.Show("Готово");
+                    if (secondExcel.NotFoundProducts.Count > 0)
+                    {
+                        MessageBox.Show(NotFoundProductsMessageBuilder(PathToNotFoundProducts(),
+                            secondExcel.NotFoundProducts.Count));
+                    }
                 }
                 else
                 {
@@ -90,6 +103,38 @@ namespace PriceTool.GUI
         private void Cancel_Button_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private string PathToNotFoundProducts()
+        {
+            if(!string.IsNullOrEmpty(pathToNewPriceList.Text))
+            {
+                return pathToNewPriceList.Text + $"{Path.DirectorySeparatorChar}NotFoundProducts.xlsx";
+            }
+            if (!string.IsNullOrEmpty(pathToNewPrices.Text))
+            {
+                return Path.GetDirectoryName(pathToNewPrices.Text) + $"{Path.DirectorySeparatorChar}NotFoundProducts.xlsx";
+            }
+            else
+            {
+                return Path.GetTempPath() + $"{Path.DirectorySeparatorChar}NotFoundProducts.xlsx";
+            }
+        }
+
+        private void CreateNotFoundProducts(string path, ExcelParser parser)
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+            parser.SaveNotFoundProducts(parser.NotFoundProducts, path)
+                .SaveAs(path);
+        }
+
+        private string NotFoundProductsMessageBuilder(string path, int count)
+        {
+            return $"No products found : {count} \n " +
+                   $"detailed : ${path}";
         }
 
         private void Select_pathToNewPrices_Button_Click(object sender, RoutedEventArgs e)

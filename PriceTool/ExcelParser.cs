@@ -86,8 +86,7 @@ namespace PriceTool
 
         public IXLWorkbook SaveNotFoundProducts(List<Product> notFoundProducts, string path)
         {
-            File.Delete(path);
-            IXLWorkbook newWorkbook = new XLWorkbook(path); 
+            IXLWorkbook newWorkbook = new XLWorkbook(); 
             newWorkbook.AddWorksheet();
             IXLWorksheet newWorksheet = newWorkbook.Worksheet(1);
             int row = 2;
@@ -102,7 +101,6 @@ namespace PriceTool
                 newWorksheet.Cell(row, 3).Value = product.Price;
                 row++;
             }
-            Workbook.Save();
             return newWorkbook;
         }
 
