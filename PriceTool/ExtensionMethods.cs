@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,7 +19,7 @@ namespace PriceTool
 
         public static string ParseVendorCode(string name)
         {
-            return new Regex(@"\([^()]*\)$").Match(name).Value.Trim('(',')');
+            return new Regex(@"\([^()]*\)").Match(name).Value.Trim('(',')');
         }
     }
 }

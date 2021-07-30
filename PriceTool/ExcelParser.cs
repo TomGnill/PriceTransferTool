@@ -67,15 +67,28 @@ namespace PriceTool
             {
                 if (!string
                     .IsNullOrEmpty(MainSheet.Cell(row, _priceColumnNumber)
-                        .Value.ToString()))
+                        .Value.ToString())
+                    && MainSheet.Cell(row, _nameColumnNumber).Value.ToString().Contains("("))
                 {
-                    string vendorCode = ExtensionMethods.ParseVendorCode(MainSheet.Cell(row, _nameColumnNumber).Value.ToString());
-                    if (ExtensionMethods.CheckVendorCode(vendorCode, newPrices))
+                    string productName = MainSheet.Cell(row, _nameColumnNumber).Value.ToString();
+                    while (productName.Contains("(") && productName.Contains(")"))
                     {
-                        IsChanged = true;
-                        Product product = newPrices.Find(prod => prod.VendorCode == vendorCode);
-                        MainSheet.Cell(row, _newPricesColumn).Value = product.Price;
-                        newPrices.Remove(product);
+                        string vendorCode =
+                            ExtensionMethods.ParseVendorCode(productName);
+                        if (ExtensionMethods.CheckVendorCode(vendorCode, newPrices))
+                        {
+                            IsChanged = true;
+                            Product product = newPrices.Find(prod => prod.VendorCode == vendorCode);
+                            MainSheet.Cell(row, _newPricesColumn).Value = product.Price;
+                            newPrices.Remove(product);
+                            break;
+                        }
+                        if(vendorCode != "")
+                        {
+                           productName = productName
+                               .Replace(vendorCode, string.Empty)
+                               .Replace("()", string.Empty);
+                        }
                     }
                 }
             }
