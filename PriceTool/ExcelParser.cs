@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using ClosedXML.Excel;
 using System.Linq;
-using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace PriceTool
 {
     public class ExcelParser
     {
+        private KeyDictionary _keyDictionary;
         public IXLWorkbook Workbook { get; set; }
         private IXLWorksheet MainSheet { get; set; }
         public List<Product> NotFoundProducts;
@@ -20,8 +18,9 @@ namespace PriceTool
         private int _priceStartRow;
         private int _newPricesColumn;
 
-        public ExcelParser(string path)
+        public ExcelParser(string path, KeyDictionary keyDictionary)
         {
+            _keyDictionary = keyDictionary;
             Workbook = new XLWorkbook(path);
             MainSheet = Workbook.Worksheets.Worksheet(1);
         }
@@ -55,7 +54,7 @@ namespace PriceTool
             List<Product> allNewPrices = new List<Product>();
             foreach (var strings in xlsxs)
             {
-                allNewPrices.AddRange(new ExcelParser(strings).ParsePriceList());
+                allNewPrices.AddRange(new ExcelParser(strings, _keyDictionary).ParsePriceList());
             }
             return allNewPrices;
         }
@@ -122,24 +121,19 @@ namespace PriceTool
             int column = 1;
             for (int row = 1; row < MainSheet.RowCount(); row++)
             {
-                if ((MainSheet.Cell(row, column).Value.ToString() == "Наименование") ||
-                    (MainSheet.Cell(row, column).Value.ToString() == "Артикул"))
+                if (_keyDictionary.NameKey.Contains(MainSheet.Cell(row, column).Value.ToString()) )
                 {
                     for (column = 1; column < MainSheet.ColumnCount(); column++)
                     {
-                        if (MainSheet.Cell(row, column).Value.ToString()
-                            == "Артикул")
+                        if (_keyDictionary.VendorCodeKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
                         {
                             _vendorCodeColumnNumber = column;
                         }
-                        if (MainSheet.Cell(row, column).Value.ToString()
-                            == "Наименование")
+                        if (_keyDictionary.NameKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
                         {
                             _nameColumnNumber = column;
                         }
-                        if (MainSheet.Cell(row, column).Value.ToString()
-                            == "РРЦ, руб. с НДС" || MainSheet.Cell(row, column).Value.ToString().ToLower()
-                            == "Цена".ToLower())
+                        if (_keyDictionary.PriceKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
                         {
                             _priceColumnNumber = column;
                         }
@@ -163,19 +157,16 @@ namespace PriceTool
             int column = 1;
             for (int row = 1; row < MainSheet.RowCount(); row++)
             {
-                if ((MainSheet.Cell(row, column).Value.ToString() == "Наименование товара") ||
-                    (MainSheet.Cell(row, column).Value.ToString() == "Код"))
+                if (_keyDictionary.NameKey.Contains(MainSheet.Cell(row, column).Value.ToString())
+                    && _keyDictionary.PriceKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
                 {
                     for (column = 1; column < MainSheet.ColumnCount(); column++)
                     {
-                        if (MainSheet.Cell(row, column).Value.ToString()
-                            == "Наименование товара")
+                        if (_keyDictionary.NameKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
                         {
                             _nameColumnNumber = column;
                         }
-                        if (MainSheet.Cell(row, column).Value.ToString()
-                            == "Цена Розница, руб." || MainSheet.Cell(row, column).Value.ToString().ToLower()
-                            == "Цена".ToLower())
+                        if (_keyDictionary.PriceKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
                         {
                             _priceColumnNumber = column;
                             _newPricesColumn = _priceColumnNumber + 1;

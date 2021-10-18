@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -20,82 +21,59 @@ namespace PriceTool
 
         public KeyDictionary()
         {
-            if (!Directory.Exists(_saveDirPath))
-            {
-                Directory.CreateDirectory(_saveDirPath);
-            }
-            if (!Load())
-            {
-                PriceKey = new List<string>();
-                NameKey = new List<string>();
-                VendorCodeKey = new List<string>();
-            }
+            PriceKey = new List<string>();
+            NameKey = new List<string>();
+            VendorCodeKey = new List<string>();
         }
 
-        public void AddNameKeys(string keys)
+        public void AddNameKey(string key)
         {
-            string[] strings = keys.Split(',');
-            NameKey.AddRange(strings);
+            NameKey.Add(key);
         }
-        public void AddPriceKeys(string keys)
+        public void AddPriceKeys(string key)
         {
-            string[] strings = keys.Split(',');
-            PriceKey.AddRange(strings);
+            PriceKey.Add(key);
         }
-        public void AddVendorCodeKeys(string keys)
+        public void AddVendorCodeKeys(string key)
         {
-            string[] strings = keys.Split(',');
-            VendorCodeKey.AddRange(strings);
+            VendorCodeKey.Add(key);
         }
 
-        public void Save()
+        
+        public void ExecuteSave()
         {
-            Task.Run(() => (ExecuteSave()));
-        }
-        public async Task ExecuteSave()
-        {
-            using (FileStream fs = new FileStream(_savePath, FileMode.OpenOrCreate))
-            {
-                await JsonSerializer.SerializeAsync<KeyDictionary>(fs, this);
-            }
+            CheckDir();
+            ClearSettings();
+            File.WriteAllText(_savePath, JsonSerializer.Serialize<KeyDictionary>(this), Encoding.UTF8);
+            //await JsonSerializer.SerializeAsync<KeyDictionary>(fs, this);
         }
 
         public  void ClearSettings()
         {
+            PriceKey = new List<string>();
+            NameKey = new List<string>();
+            VendorCodeKey = new List<string>();
             if (File.Exists(_savePath))
             {
                 File.Delete(_savePath);
             }
         }
 
-        private bool Load()
+        public void CheckDir()
         {
-          return Task.Run(TryLoad).Result;
+            if (!Directory.Exists(_saveDirPath))
+            {
+                Directory.CreateDirectory(_saveDirPath);
+            }
         }
-        private async Task<bool> TryLoad()
-        {
-            if (File.Exists(_savePath))
-            {
-                using (FileStream fs = new FileStream(_savePath, FileMode.OpenOrCreate))
-                {
-                    if (File.Exists(_savePath))
-                    {
-                        KeyDictionary restoredSettings = await JsonSerializer.DeserializeAsync<KeyDictionary>(fs);
-                        this.NameKey = restoredSettings.NameKey;
-                        this.PriceKey = restoredSettings.PriceKey;
-                        this.VendorCodeKey = restoredSettings.VendorCodeKey;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-            else
-            {
-                return false;
-            }
 
+        public bool Load()
+        {
+            if (!File.Exists(_savePath)) return false;
+            KeyDictionary restoredSettings = JsonSerializer.Deserialize<KeyDictionary>(File.ReadAllText(_savePath, Encoding.UTF8));
+            this.NameKey = restoredSettings.NameKey;
+            this.PriceKey = restoredSettings.PriceKey;
+            this.VendorCodeKey = restoredSettings.VendorCodeKey;
             return true;
         }
     }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
+using System.Text.Json;
 using FileDialog = System.Windows.Forms.FileDialog;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
@@ -13,17 +14,18 @@ using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 
 namespace PriceTool.GUI
 {
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
+        private KeyDictionary _keyDictionary;
         public MainWindow()
         {
             Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
             InitializeComponent();
+            _keyDictionary = new KeyDictionary();
+            _keyDictionary.Load();
             pathToNewPrices.Text = @"C:\example.xlsx";
             pathToPriceList.Text = @"C:\example.xlsx";
+            TryLoad();
         }
 
         private void Transfer_Button_Click(object sender, RoutedEventArgs e)
@@ -42,7 +44,7 @@ namespace PriceTool.GUI
                                                                      && pathToNewPrices.Text != @"C:\example.xlsx")
                     {
                         ExcelParser firstParser = new ExcelParser();
-                        ExcelParser secondExcel = new ExcelParser(pathToPriceList.Text);
+                        ExcelParser secondExcel = new ExcelParser(pathToPriceList.Text, _keyDictionary);
                         secondExcel
                             .TransferPrices(firstParser.MultiParseList(pathToNewPriceList.Text));
                         if (secondExcel.IsChanged)
@@ -74,8 +76,8 @@ namespace PriceTool.GUI
                                                                 pathToPriceList.Text.EndsWith(".xlsx")
                                                                  && pathToNewPrices.Text != @"C:\example.xlsx")
                 {
-                    ExcelParser firstExcel = new ExcelParser(pathToNewPrices.Text);
-                    ExcelParser secondExcel = new ExcelParser(pathToPriceList.Text);
+                    ExcelParser firstExcel = new ExcelParser(pathToNewPrices.Text, _keyDictionary);
+                    ExcelParser secondExcel = new ExcelParser(pathToPriceList.Text, _keyDictionary);
                     secondExcel
                         .TransferPrices(firstExcel.ParsePriceList());
                     if (secondExcel.IsChanged)
@@ -172,6 +174,45 @@ namespace PriceTool.GUI
             if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 pathToPriceList.Text = saveFileDialog.FileName;
+            }
+        }
+
+        private void Save_Button_Click(object sender, RoutedEventArgs e)
+        {
+            PathDictionary pd = new PathDictionary
+            {
+                pathToNewPrices = pathToNewPrices.Text, pathToPriceList = pathToPriceList.Text, pathToNewPriceList = pathToNewPriceList.Text
+            };
+            pd.Save();
+        }
+
+        private void KeySettings_Button_Click(object sender, RoutedEventArgs e)
+        {
+            KeySettingsWindow newWindow = new KeySettingsWindow();
+            newWindow.Show();
+            newWindow.Closed += TransferSettings;
+        }
+
+        private void TransferSettings(object sender, EventArgs e)
+        {
+            _keyDictionary.Load();
+        }
+
+        private void TryLoad()
+        {
+            PathDictionary pd = new PathDictionary();
+            pd.Load();
+            if (!string.IsNullOrEmpty(pd.pathToPriceList))
+            {
+                pathToPriceList.Text = pd.pathToPriceList;
+            }
+            if (!string.IsNullOrEmpty(pd.pathToNewPriceList))
+            {
+                pathToNewPriceList.Text = pd.pathToNewPriceList;
+            }
+            else if (!string.IsNullOrEmpty(pd.pathToNewPrices))
+            {
+                pathToNewPrices.Text = pd.pathToNewPrices;
             }
         }
     }
