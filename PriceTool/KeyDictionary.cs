@@ -42,13 +42,13 @@ namespace PriceTool
         
         public void ExecuteSave()
         {
-            CheckDir();
-            ClearSettings();
+            CheckDir(); 
+            //ClearSettings();
             File.WriteAllText(_savePath, JsonSerializer.Serialize<KeyDictionary>(this), Encoding.UTF8);
             //await JsonSerializer.SerializeAsync<KeyDictionary>(fs, this);
         }
 
-        public  void ClearSettings()
+        public void ClearSettings()
         {
             PriceKey = new List<string>();
             NameKey = new List<string>();
@@ -57,6 +57,7 @@ namespace PriceTool
             {
                 File.Delete(_savePath);
             }
+            File.WriteAllText(_savePath, JsonSerializer.Serialize<KeyDictionary>(this), Encoding.UTF8);
         }
 
         public void CheckDir()

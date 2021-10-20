@@ -21,6 +21,12 @@ namespace PriceTool.GUI
             this.Close();
         }
 
+        private void Clear_Button_Click(object sender, RoutedEventArgs e)
+        {
+            KeyDictionary.ClearSettings();
+            this.Close();
+        }
+
         private void Add_Name_Button_Click(object sender, RoutedEventArgs e)
         {
             KeyDictionary.NameKey.Add(KeyName.Text);

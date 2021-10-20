@@ -20,5 +20,6 @@
         <Button Content="+" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="Add_Vendor_Button_Click" Name="Select_FolderPath_Button" Height ="20" Width="26" Margin="0,0,43,243" RenderTransformOrigin="0.47,-0.099"/>
         <Button Content="+" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="Add_Name_Button_Click" Name="Select_repoPath_Button" Height ="20" Width="26" Margin="0,0,43,362" RenderTransformOrigin="0.47,-0.099"/>
         <Button Content="Save and close" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="Cancel_Button_Click" Name="Cancel_Button" Height ="23" Width="105" Margin="0,0,100,26"/>
+        <Button Content="Clear" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="Clear_Button_Click" Name="Clear_Button" Height ="23" Width="105" Margin="0,0,534,20" RenderTransformOrigin="0.79,0.217"/>
     </Grid>
 </Window>

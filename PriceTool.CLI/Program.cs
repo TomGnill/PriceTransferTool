@@ -17,10 +17,7 @@ namespace PriceTool.CLI
 
             KeyDictionary keyDictionary = new KeyDictionary();
             keyDictionary.Load();
-            keyDictionary.ClearSettings();
-            keyDictionary.AddNameKey("NameOf");
-            keyDictionary.AddNameKey("Слово на русском");
-            Console.WriteLine(string.Join("...", keyDictionary.NameKey));
+            keyDictionary.PriceKey.RemoveAt(2);
             keyDictionary.ExecuteSave();
             //Directory.CreateDirectory($@"C:\Users\{Environment.UserName}\AppData\Local\PriceToolCache\");
             //Console.WriteLine(JsonSerializer.Serialize<KeyDictionary>(keyDictionary));

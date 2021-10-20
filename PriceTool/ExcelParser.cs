@@ -10,6 +10,7 @@ namespace PriceTool
         private KeyDictionary _keyDictionary;
         public IXLWorkbook Workbook { get; set; }
         private IXLWorksheet MainSheet { get; set; }
+        private List<string> CodeWords { get; set; }
         public List<Product> NotFoundProducts;
         public bool IsChanged = false;
         private int _vendorCodeColumnNumber;
@@ -23,6 +24,10 @@ namespace PriceTool
             _keyDictionary = keyDictionary;
             Workbook = new XLWorkbook(path);
             MainSheet = Workbook.Worksheets.Worksheet(1);
+            CodeWords = new List<string>();
+            CodeWords.AddRange(_keyDictionary.NameKey);
+            CodeWords.AddRange(_keyDictionary.VendorCodeKey);
+            CodeWords.AddRange(_keyDictionary.PriceKey);
         }
 
         public ExcelParser() { }
@@ -31,7 +36,6 @@ namespace PriceTool
         {
             ParseColumnsNewPriceList();
             List<Product> newPrices = new List<Product>();
-
             for (int row = _priceStartRow; row < MainSheet.RowCount(); row++)
             {
                 if (!string
@@ -118,22 +122,27 @@ namespace PriceTool
 
         public void ParseColumnsNewPriceList()
         {
+            List<string> CodeWords = new List<string>();
+            CodeWords.AddRange(_keyDictionary.NameKey);
+            CodeWords.AddRange(_keyDictionary.VendorCodeKey);
+            CodeWords.AddRange(_keyDictionary.PriceKey);
             int column = 1;
             for (int row = 1; row < MainSheet.RowCount(); row++)
             {
-                if (_keyDictionary.NameKey.Contains(MainSheet.Cell(row, column).Value.ToString()) )
+                if (CodeWords.Contains(MainSheet.Cell(row, column).Value.ToString()))
                 {
                     for (column = 1; column < MainSheet.ColumnCount(); column++)
                     {
-                        if (_keyDictionary.VendorCodeKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
+                        string cellValue = MainSheet.Cell(row, column).Value.ToString();
+                        if (_keyDictionary.VendorCodeKey.Contains(cellValue))
                         {
                             _vendorCodeColumnNumber = column;
                         }
-                        if (_keyDictionary.NameKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
+                        if (_keyDictionary.NameKey.Contains(cellValue))
                         {
                             _nameColumnNumber = column;
                         }
-                        if (_keyDictionary.PriceKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
+                        if (_keyDictionary.PriceKey.Contains(cellValue))
                         {
                             _priceColumnNumber = column;
                         }
@@ -157,16 +166,16 @@ namespace PriceTool
             int column = 1;
             for (int row = 1; row < MainSheet.RowCount(); row++)
             {
-                if (_keyDictionary.NameKey.Contains(MainSheet.Cell(row, column).Value.ToString())
-                    && _keyDictionary.PriceKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
+                if (CodeWords.Contains(MainSheet.Cell(row, column).Value.ToString()))
                 {
                     for (column = 1; column < MainSheet.ColumnCount(); column++)
                     {
-                        if (_keyDictionary.NameKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
+                        string cellValue = MainSheet.Cell(row, column).Value.ToString();
+                        if (_keyDictionary.NameKey.Contains(cellValue))
                         {
                             _nameColumnNumber = column;
                         }
-                        if (_keyDictionary.PriceKey.Contains(MainSheet.Cell(row, column).Value.ToString()))
+                        if (_keyDictionary.PriceKey.Contains(cellValue))
                         {
                             _priceColumnNumber = column;
                             _newPricesColumn = _priceColumnNumber + 1;
