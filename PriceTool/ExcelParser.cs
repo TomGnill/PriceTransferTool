@@ -129,7 +129,8 @@ namespace PriceTool
             int column = 1;
             for (int row = 1; row < MainSheet.RowCount(); row++)
             {
-                if (CodeWords.Contains(MainSheet.Cell(row, column).Value.ToString()))
+                if (CodeWords.Contains(MainSheet.Cell(row, column).Value.ToString())
+                    || CodeWords.Contains(MainSheet.Cell(row, column + 1).Value.ToString()))
                 {
                     for (column = 1; column < MainSheet.ColumnCount(); column++)
                     {
@@ -163,6 +164,8 @@ namespace PriceTool
 
         public void ParseColumnPriceList()
         {
+            CodeWords.AddRange(new List<string>() {"Код", "Цена Розница, руб." });
+            _keyDictionary.PriceKey.Add("Цена Розница, руб.");
             int column = 1;
             for (int row = 1; row < MainSheet.RowCount(); row++)
             {

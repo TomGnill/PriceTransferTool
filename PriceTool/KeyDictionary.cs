@@ -42,10 +42,8 @@ namespace PriceTool
         
         public void ExecuteSave()
         {
-            CheckDir(); 
-            //ClearSettings();
+            CheckDir();
             File.WriteAllText(_savePath, JsonSerializer.Serialize<KeyDictionary>(this), Encoding.UTF8);
-            //await JsonSerializer.SerializeAsync<KeyDictionary>(fs, this);
         }
 
         public void ClearSettings()

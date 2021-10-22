@@ -17,16 +17,16 @@ namespace PriceTool
            Price = price;
        }
 
-       public Product( string name, int price)
+       public Product(string name, int price)
        {
            VendorCode = ParseVendorCode(name);
            Name = name;
            Price = price;
        }
 
-        private string ParseVendorCode(string Name)
-       {
+        private string ParseVendorCode(string name)
+        {
            return string.Empty;
-       }
+        }
    }
 }

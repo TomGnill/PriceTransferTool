@@ -5,21 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PriceTool.GUI"
         mc:Ignorable="d"
-        Title="KeySettingsWindow" Height="450" Width="668.293">
+        Title="KeySettingsWindow" Height="450" Width="668.293" ResizeMode="NoResize">
     <Grid>
-        <ListView Name="listNameKeys" Margin="10,37,354,287" ItemsSource="{DynamicResource ResourceKey=KeyDictionary.NameKey}"/>
-        <ListView Name="listVendorCodes" Margin="10,156,354,168" ItemsSource="{DynamicResource ResourceKey=KeyDictionary.VendorCodeKey}"/>
-        <ListView Name="listPriceKeys" Margin="10,267,354,57" ItemsSource="{DynamicResource ResourceKey=KeyDictionary.PriceKey}"/>
-        <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="20" Width="163" Margin="326,0,0,157"><Run Text="Ключевые цены"/></TextBlock>
-        <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="20" Width="163" Margin="326,0,0,263"><Run Text="Ключевые артикулы"/></TextBlock>
-        <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="20" Width="163" Margin="326,0,0,382"><Run Text="Ключевые Имена"/></TextBlock>
+        <ListView Name="listNameKeys" HorizontalAlignment="Left" Height ="85" Width="280" Margin="10,37,354,287" ItemsSource="{DynamicResource ResourceKey=KeyDictionary.NameKey}"/>
+        <ListView Name="listVendorCodes" HorizontalAlignment="Left" Height ="85" Width="280" Margin="10,156,354,168" ItemsSource="{DynamicResource ResourceKey=KeyDictionary.VendorCodeKey}"/>
+        <ListView Name="listPriceKeys" HorizontalAlignment="Left" Height ="85" Width="280" Margin="10,267,0,67" ItemsSource="{DynamicResource ResourceKey=KeyDictionary.PriceKey}"/>
+        <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="20" Width="234" Margin="326,0,0,157"><Run Text="Возможное название колонки цен"/></TextBlock>
+        <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="20" Width="234" Margin="326,0,0,263"><Run Text="Возможное название колонки артиркулов"/></TextBlock>
+        <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="20" Width="234" Margin="326,0,0,382"><Run Text="Возможное название колонки наименов."/></TextBlock>
         <TextBox VerticalAlignment="Bottom" x:Name ="KeyPrice" Background="Beige"  Height="20" Margin="326,0,100,132"></TextBox>
         <TextBox VerticalAlignment="Bottom" x:Name ="KeyVendor" Background="Beige"  Height="20" Margin="326,0,100,243" RenderTransformOrigin="-0.458,0.291"></TextBox>
         <TextBox VerticalAlignment="Bottom" x:Name ="KeyName" Background="Beige"  Height="20" Margin="326,0,100,362"/>
         <Button Content="+" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="Add_Price_Button_Click" Name="Select_Path_Button" Height ="20" Width="26" Margin="0,0,43,132" RenderTransformOrigin="0.47,-0.099"/>
         <Button Content="+" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="Add_Vendor_Button_Click" Name="Select_FolderPath_Button" Height ="20" Width="26" Margin="0,0,43,243" RenderTransformOrigin="0.47,-0.099"/>
         <Button Content="+" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="Add_Name_Button_Click" Name="Select_repoPath_Button" Height ="20" Width="26" Margin="0,0,43,362" RenderTransformOrigin="0.47,-0.099"/>
-        <Button Content="Save and close" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="Cancel_Button_Click" Name="Cancel_Button" Height ="23" Width="105" Margin="0,0,100,26"/>
-        <Button Content="Clear" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="Clear_Button_Click" Name="Clear_Button" Height ="23" Width="105" Margin="0,0,534,20" RenderTransformOrigin="0.79,0.217"/>
+        <Button Content="Сохр. и выйти" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="Cancel_Button_Click" Name="Cancel_Button" Height ="23" Width="105" Margin="0,0,100,26"/>
+        <Button Content="Отчистить" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="Clear_Button_Click" Name="Clear_Button" Height ="23" Width="105" Margin="10,0,0,20" RenderTransformOrigin="0.79,0.217"/>
     </Grid>
 </Window>
