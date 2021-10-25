@@ -17,6 +17,19 @@ namespace PriceTool
                 .Contains(vendorCode);
         }
 
+        public static Product CheckVendorCodeByName(string productName, List<Product> products)
+        {
+            foreach (var product in products)
+            {
+                if (productName.Contains(product.VendorCode))
+                {
+                    return product;
+                }
+            }
+
+            return null;
+        }
+
         public static string ParseVendorCode(string name)
         {
             return new Regex(@"\([^()]*\)").Match(name).Value.Trim('(',')');

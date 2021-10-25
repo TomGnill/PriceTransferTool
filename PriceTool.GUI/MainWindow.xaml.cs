@@ -45,8 +45,8 @@ namespace PriceTool.GUI
                     {
                         ExcelParser firstParser = new ExcelParser();
                         ExcelParser secondExcel = new ExcelParser(pathToPriceList.Text, _keyDictionary);
-                        secondExcel
-                            .TransferPrices(firstParser.MultiParseList(pathToNewPriceList.Text));
+                        //secondExcel.TransferPrices(firstParser.MultiParseList(pathToNewPriceList.Text));
+                        secondExcel.TransferPricesInvert(firstParser.MultiParseList(pathToNewPriceList.Text));
                         if (secondExcel.IsChanged)
                         {
                             secondExcel.Workbook.Save();
@@ -78,8 +78,8 @@ namespace PriceTool.GUI
                 {
                     ExcelParser firstExcel = new ExcelParser(pathToNewPrices.Text, _keyDictionary);
                     ExcelParser secondExcel = new ExcelParser(pathToPriceList.Text, _keyDictionary);
-                    secondExcel
-                        .TransferPrices(firstExcel.ParsePriceList());
+                    //secondExcel.TransferPrices(firstExcel.ParsePriceList());
+                    secondExcel.TransferPricesInvert(firstExcel.ParsePriceList());
                     if (secondExcel.IsChanged)
                     {
                         secondExcel.Workbook.Save();

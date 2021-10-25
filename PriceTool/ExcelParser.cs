@@ -100,6 +100,33 @@ namespace PriceTool
             return this;
         }
 
+        public ExcelParser TransferPricesInvert(List<Product> newPrices)
+        {
+            ParseColumnPriceList();
+            for (int row = _priceStartRow; row < MainSheet.RowCount(); row++)
+            {
+                if (!string
+                        .IsNullOrEmpty(MainSheet.Cell(row, _priceColumnNumber)
+                        .Value.ToString()))
+                {
+                    string productName = MainSheet.Cell(row, _nameColumnNumber).Value.ToString();
+                    Product productPrice = ExtensionMethods.CheckVendorCodeByName(productName, newPrices);
+                    if (productPrice != null)
+                    {
+                        IsChanged = true;
+                        MainSheet.Cell(row, _newPricesColumn).Value = productPrice.Price;
+                        newPrices.Remove(productPrice);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+            NotFoundProducts = newPrices;
+            return this;
+        }
+
         public IXLWorkbook SaveNotFoundProducts(List<Product> notFoundProducts, string path)
         {
             IXLWorkbook newWorkbook = new XLWorkbook(); 
@@ -122,10 +149,6 @@ namespace PriceTool
 
         public void ParseColumnsNewPriceList()
         {
-            List<string> CodeWords = new List<string>();
-            CodeWords.AddRange(_keyDictionary.NameKey);
-            CodeWords.AddRange(_keyDictionary.VendorCodeKey);
-            CodeWords.AddRange(_keyDictionary.PriceKey);
             int column = 1;
             for (int row = 1; row < MainSheet.RowCount(); row++)
             {
