@@ -21,7 +21,9 @@ namespace PriceTool
         {
             foreach (var product in products)
             {
-                if (productName.Contains(product.VendorCode))
+                if (productName.Contains(product.VendorCode)
+                    && (!string.IsNullOrEmpty(product.VendorCode)
+                    || !string.IsNullOrWhiteSpace(product.VendorCode)))
                 {
                     return product;
                 }

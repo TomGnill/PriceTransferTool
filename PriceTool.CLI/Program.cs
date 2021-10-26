@@ -17,6 +17,7 @@ namespace PriceTool.CLI
             //Console.WriteLine(ExtensionMethods.ParseVendorCode("Настенный комплект 20-1/2 универсальный серый(221020) gfsfs аыа (5252)"));
             bool test = testString.Contains("221020");
             Console.WriteLine(test);
+
             //KeyDictionary keyDictionary = new KeyDictionary();
             //keyDictionary.Load();
             //keyDictionary.PriceKey.RemoveAt(2);
